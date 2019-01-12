@@ -3,9 +3,10 @@ from src.common.database import Database
 import src.models.stores.constants as StoreConstants
 import src.models.stores.errors as StoreErrors
 
+__author__ = 'jslvtr'
+
 
 class Store(object):
-
     def __init__(self, name, url_prefix, tag_name, query, _id=None):
         self.name = name
         self.url_prefix = url_prefix
@@ -17,7 +18,7 @@ class Store(object):
         return "<Store {}>".format(self.name)
 
     def json(self):
-        return{
+        return {
             "_id": self._id,
             "name": self.name,
             "url_prefix": self.url_prefix,
@@ -25,9 +26,16 @@ class Store(object):
             "query": self.query
         }
 
+    def delete(self):
+        Database.remove(StoreConstants.COLLECTION, {'_id': self._id})
+
+    @classmethod
+    def all(cls):
+        return [cls(**elem) for elem in Database.find(StoreConstants.COLLECTION, {})]
+
     @classmethod
     def get_by_id(cls, id):
-        return cls(**Database.find_one(StoreConstants.COLLECTION, {"id": id}))
+        return cls(**Database.find_one(StoreConstants.COLLECTION, {"_id": id}))
 
     def save_to_mongo(self):
         Database.update(StoreConstants.COLLECTION, {'_id': self._id}, self.json())
@@ -42,19 +50,14 @@ class Store(object):
 
     @classmethod
     def find_by_url(cls, url):
+        """
+        Return a store from a url like "http://www.johnlewis.com/item/sdfj4h5g4g21k.html"
+        :param url: The item's URL
+        :return: a Store, or raises a StoreNotFoundException if no store matches the URL
+        """
         for i in range(0, len(url)+1):
             try:
                 store = cls.get_by_url_prefix(url[:i])
                 return store
             except:
-                raise StoreErrors.StoreNotFoundException("The URL Prefix used to find the store had any results!")
-
-    @classmethod
-    def all(cls):
-        return [cls(**elem) for elem in Database.find(StoreConstants.COLLECTION, {})]
-
-    def delete(self):
-        Database.remove(StoreConstants.COLLECTION, {'id': self._id})
-
-
-
+                raise StoreErrors.StoreNotFoundException("The URL Prefix used to find the store didn't give us any results!")

@@ -1,3 +1,5 @@
+__author__ = 'jslvtr'
+
 
 class StoreException(Exception):
     def __init__(self, message):
@@ -6,5 +8,3 @@ class StoreException(Exception):
 
 class StoreNotFoundException(StoreException):
     pass
-
-

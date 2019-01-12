@@ -1,15 +1,15 @@
 import uuid
-
-import requests
 from bs4 import BeautifulSoup
+import requests
 import re
 from src.common.database import Database
 import src.models.items.constants as ItemConstants
 from src.models.stores.store import Store
 
+__author__ = 'jslvtr'
+
 
 class Item(object):
-
     def __init__(self, name, url, price=None, _id=None):
         self.name = name
         self.url = url
@@ -31,7 +31,7 @@ class Item(object):
 
         pattern = re.compile("(\d+.\d+)")
         match = pattern.search(string_price)
-        self.price = match.group()
+        self.price = float(match.group())
 
         return self.price
 
@@ -40,9 +40,9 @@ class Item(object):
 
     def json(self):
         return {
+            "_id": self._id,
             "name": self.name,
             "url": self.url,
-            "_id":self._id,
             "price": self.price
         }
 
